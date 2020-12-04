@@ -17,8 +17,20 @@ class SpotifyClient:
   def get_track(self, track_id):
     return self.spotify.track(track_id)
   
+  def currently_playing(self):
+    return self.spotify.currently_playing("JP")
+
   def get_now_playing_track(self):
     return self.spotify.current_user_playing_track()
+
+  def current_track_id(self):
+    return self.spotify.current_user_playing_track()
+
+  def now_playing_feature(self):
+    return self.get_track_feature(self.current_track_id())
+
+  def track_analysis(self, track_id):
+    return self.spotify.audio_analysis(track_id)
 
   def set_environment_variables(self):
     with open("config.json", "r") as file:
@@ -28,18 +40,24 @@ class SpotifyClient:
 
 if __name__ == "__main__":
     client = SpotifyClient()
-    music_id = "0LkOCCPW3vyZwdng0qvfsX"
-    feature = client.get_track_feature(music_id)
-    track_info = client.get_track(music_id)
-    playing = client.get_now_playing_track()
+    # feature = client.get_track_feature(music_id)
+    # track_info = client.get_track(music_id)
+    playing = client.get_now_playing_track()["item"]
+    track_id = playing["id"]
+    print(track_id)
+    analysis = client.track_analysis(track_id)["beats"]
 
-    print("\n ----- feature ------")
-    for k in feature[0]:
-      print(f"  {k}: {feature[0][k]}")
-    print("\n ----- track_info ------")
-    for k in track_info:
-      print(f"  {k}: {track_info[k]}")
+    # print("\n ----- feature ------")
+    # for k in feature[0]:
+    #   print(f"  {k}: {feature[0][k]}")
+    # print("\n ----- track_info ------")
+    # for k in track_info:
+    #   print(f"  {k}: {track_info[k]}")
     print("\n ----- playing ------")
     for k in playing:
       print(f"  {k}: {playing[k]}")
+    print("\n ----- analysis ------")
+    print(analysis)
+    for k in analysis:
+      print(f"  {k}: {analysis[k]}")
       

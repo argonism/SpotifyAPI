@@ -9,7 +9,7 @@ class SpotifyClient:
     credentiials = client_credentials_manager = spotipy.oauth2.SpotifyClientCredentials()
     scope = "user-read-currently-playing,user-read-playback-state,user-modify-playback-state"
     # self.spotify = spotipy.Spotify(client_credentials_manager=credentiials)
-    self.spotify = spotipy.Spotify(client_credentials_manager=SpotifyOAuth(scope=scope))
+    self.spotify = spotipy.Spotify(client_credentials_manager=SpotifyOAuth(scope=scope), requests_timeout=10)
 
   def get_track_feature(self, track_id):
     return self.spotify.audio_features(music_id)
@@ -42,20 +42,20 @@ if __name__ == "__main__":
     client = SpotifyClient()
     # feature = client.get_track_feature(music_id)
     # track_info = client.get_track(music_id)
-    playing = client.get_now_playing_track()["item"]
+    playing = client.get_now_playing_track()
+    if not playing: 
+      print("No track playing now")
+      exit()
+    playing = playing["item"]
     track_id = playing["id"]
-    print(track_id)
-    analysis = client.track_analysis(track_id)["beats"]
-
-    # print("\n ----- feature ------")
-    # for k in feature[0]:
-    #   print(f"  {k}: {feature[0][k]}")
-    # print("\n ----- track_info ------")
-    # for k in track_info:
-    #   print(f"  {k}: {track_info[k]}")
+    print("track_id:", track_id)
+    print("track_id:", playing["name"])
     print("\n ----- playing ------")
     for k in playing:
       print(f"  {k}: {playing[k]}")
+
+    analysis = client.track_analysis(track_id)["beats"]
+
     print("\n ----- analysis ------")
     print(analysis)
     for k in analysis:

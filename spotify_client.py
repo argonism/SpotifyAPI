@@ -4,12 +4,14 @@ import os
 import json
 
 class SpotifyClient:
-  def __init__(self):
+  def __init__(self, cache_path=None):
     self.set_environment_variables()
-    credentiials = client_credentials_manager = spotipy.oauth2.SpotifyClientCredentials()
-    scope = "user-read-currently-playing,user-read-playback-state,user-modify-playback-state"
-    # self.spotify = spotipy.Spotify(client_credentials_manager=credentiials)
-    self.spotify = spotipy.Spotify(client_credentials_manager=SpotifyOAuth(scope=scope), requests_timeout=10)
+    if cache_path:
+      oauth = SpotifyOAuth(cache_path=cache_path)
+      self.spotify = spotipy.Spotify(auth_manager=oauth, requests_timeout=10)
+    else:
+      scope = "user-read-currently-playing,user-read-playback-state,user-modify-playback-state"
+      self.spotify = spotipy.Spotify(client_credentials_manager=SpotifyOAuth(scope=scope), requests_timeout=10)
 
   def get_track_feature(self, track_id):
     return self.spotify.audio_features(music_id)
@@ -40,8 +42,6 @@ class SpotifyClient:
 
 if __name__ == "__main__":
     client = SpotifyClient()
-    # feature = client.get_track_feature(music_id)
-    # track_info = client.get_track(music_id)
     playing = client.get_now_playing_track()
     if not playing: 
       print("No track playing now")
@@ -58,6 +58,3 @@ if __name__ == "__main__":
 
     print("\n ----- analysis ------")
     print(analysis)
-    for k in analysis:
-      print(f"  {k}: {analysis[k]}")
-      
